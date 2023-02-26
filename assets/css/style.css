@@ -1102,3 +1102,15 @@ section {
     padding-right: 20px 15px;
   }
 }
+
+:root {
+  --bg-color: #fff;
+  --text-color: #333;
+  --link-color: blue;
+}
+
+.dark-mode {
+  --bg-color: #222;
+  --text-color: #fff;
+  --link-color: #0ff;
+}
