@@ -5,7 +5,7 @@ export const Bio = {
     "I turn ideas into reality, crafting websites that make an impact. Always ready for new challenges, I learn, build, and innovate. With a passion for growth, I create solutions that speak for themselves.",
   github: "https://github.com/dineshstark7",
   resume:
-    "https://drive.google.com/file/d/1ffZrcMcn8UatXGIaautbbqpV7ADNaETA/view?usp=sharing",
+    "https://drive.google.com/file/d/1F66YUIBhCC19uupEcZ6mCb7YlMsXnAaA/view",
   linkedin: "https://www.linkedin.com/in/nunnadineshkumar",
   twitter: "https://twitter.com/dineshstark_7",
   insta: "",
