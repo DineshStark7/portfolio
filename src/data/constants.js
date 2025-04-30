@@ -175,7 +175,7 @@ export const experiences = [
     role: "Founder - SNEDIN (In Development)",
     company: "SNEDIN",
     date: "Jan 2024 - Present",
-    desc: "SNEDIN is a startup focused on web solutions and career resources. Currently in development, it aims to help students and job seekers with learning and career growth.",
+    desc: "SNEDIN is a product focused on web solutions and career resources. Currently in development, it aims to help students and job seekers with learning and career growth.",
     skills: [
       "Next JS",
       "React JS",
