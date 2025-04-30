@@ -1,5 +1,4 @@
 import styled from "styled-components";
-import _default from "../../themes/default";
 
 export const Container = styled.div`
   background: linear-gradient(
@@ -90,7 +89,7 @@ export const Divider = styled.div`
 `;
 
 export const CardContainer = styled.div`
-  display: none;
+  display: flex;
   justify-content: center;
   align-items: center;
   gap: 28px;
