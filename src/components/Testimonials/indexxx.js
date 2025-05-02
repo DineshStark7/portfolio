@@ -200,24 +200,21 @@ const Card = styled.div`
   background-color: #1a2238;
   border-radius: 12px;
   padding: 20px;
-  width: 300px; // fixed width to ensure wrapping
+  min-width: 300px; // Removed margin
   flex-shrink: 0;
   color: #c5d1eb;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  height: 160px;
   display: flex;
   flex-direction: column;
-  align-items: center; // centers inner text
-  text-align: center; // centers paragraphs
-  height: auto; // makes height dynamic
-  word-wrap: break-word; // ensures long words wrap
-  white-space: normal; // allows wrapping
+  justify-content: center;
 
   @media (max-width: 768px) {
-    width: 250px;
+    min-width: 250px;
     padding: 16px;
+    height: 140px;
   }
 `;
-
 const Feedback = styled.p`
   font-size: 16px;
   margin-bottom: 10px;
