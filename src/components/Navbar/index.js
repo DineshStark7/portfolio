@@ -23,17 +23,15 @@ const Navbar = () => {
     <Nav>
       <NavbarContainer>
         <NavLogo to="/">
-          <a
-            style={{
-              display: "flex",
-              alignItems: "center",
-              color: "white",
-              marginBottom: "20;",
-              cursor: "pointer",
-            }}
-          >
-            <IoCodeSlash size="3rem" />
-          </a>
+          style=
+          {{
+            display: "flex",
+            alignItems: "center",
+            color: "white",
+            marginBottom: "20;",
+            cursor: "pointer",
+          }}
+          <IoCodeSlash size="3rem" />
         </NavLogo>
         <MobileIcon>
           <FaBars
