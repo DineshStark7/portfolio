@@ -1,7 +1,9 @@
 import React, { useRef, useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import emailjs from "@emailjs/browser";
 import { Snackbar } from "@mui/material";
+
+// ================= Styled Components =================
 
 const Container = styled.div`
   display: flex;
@@ -109,7 +111,6 @@ const ContactButton = styled.input`
   width: 100%;
   text-decoration: none;
   text-align: center;
-  background: hsla(221, 100%, 50%, 1);
   background: linear-gradient(
     225deg,
     hsla(221, 100%, 50%, 1) 0%,
@@ -135,7 +136,7 @@ const ContactButton = styled.input`
     cursor: not-allowed;
     transform: none;
     filter: none;
-    background: ${({ theme }) => theme.button_disabled}
+  }
 `;
 
 const ErrorText = styled.p`
@@ -145,10 +146,75 @@ const ErrorText = styled.p`
   text-align: center;
 `;
 
+// ================= Modal / Animation =================
+
+const fadeIn = keyframes`
+  from {opacity: 0;}
+  to {opacity: 1;}
+`;
+
+const spin = keyframes`
+  to {transform: rotate(360deg);}
+`;
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 15, 15, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: ${fadeIn} 0.3s ease-in-out;
+  z-index: 1000;
+`;
+
+const ModalBox = styled.div`
+  background: ${({ theme }) => theme.card};
+  padding: 40px;
+  border-radius: 16px;
+  text-align: center;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 28px;
+`;
+
+const Loader = styled.div`
+  border: 5px solid #ddd;
+  border-top: 5px solid ${({ theme }) => theme.primary};
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: ${spin} 1s linear infinite;
+  margin: auto;
+`;
+
+const TickCircle = styled.div`
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: #4caf50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 42px;
+  color: white;
+  margin: auto;
+`;
+
+const ModalText = styled.div`
+  margin-top: 20px;
+  font-size: 18px;
+  color: ${({ theme }) => theme.text_primary};
+`;
+
+// ================= Component =================
+
 const Contact = () => {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
   const [touched, setTouched] = useState({});
+  const [modal, setModal] = useState({ visible: false, success: false });
   const form = useRef();
 
   const [formData, setFormData] = useState({
@@ -158,12 +224,10 @@ const Contact = () => {
     message: "",
   });
 
-  // ✅ Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Track if user touched a field (for red border)
   const handleBlur = (e) => {
     setTouched({ ...touched, [e.target.name]: true });
   };
@@ -183,7 +247,6 @@ const Contact = () => {
     formData.subject &&
     formData.message;
 
-  // ✅ Handle Submit
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -200,6 +263,9 @@ const Contact = () => {
 
     setError("");
 
+    // Show modal loader
+    setModal({ visible: true, success: false });
+
     emailjs
       .sendForm(
         "service_xzy587d",
@@ -209,6 +275,12 @@ const Contact = () => {
       )
       .then(
         () => {
+          // Show success tick
+          setModal({ visible: true, success: true });
+
+          // Auto-close after 2 seconds
+          setTimeout(() => setModal({ visible: false, success: false }), 2000);
+
           setOpen(true);
           form.current.reset();
           setFormData({
@@ -222,6 +294,7 @@ const Contact = () => {
         (error) => {
           console.log(error.text);
           setError("Something went wrong. Please try again.");
+          setModal({ visible: false, success: false });
         }
       );
   };
@@ -287,6 +360,25 @@ const Contact = () => {
           message="Email sent successfully!"
         />
       </Wrapper>
+
+      {/* ===== Modal Overlay ===== */}
+      {modal.visible && (
+        <ModalOverlay>
+          <ModalBox>
+            {modal.success ? (
+              <>
+                <TickCircle>✓</TickCircle>
+                <ModalText>Message sent successfully!</ModalText>
+              </>
+            ) : (
+              <>
+                <Loader />
+                <ModalText>Sending your message...</ModalText>
+              </>
+            )}
+          </ModalBox>
+        </ModalOverlay>
+      )}
     </Container>
   );
 };
