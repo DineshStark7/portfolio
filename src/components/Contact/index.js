@@ -1,6 +1,5 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
-import { useRef } from "react";
 import emailjs from "@emailjs/browser";
 import { Snackbar } from "@mui/material";
 
@@ -77,12 +76,14 @@ const ContactTitle = styled.div`
 const ContactInput = styled.input`
   flex: 1;
   background-color: transparent;
-  border: 1px solid ${({ theme }) => theme.text_secondary};
+  border: 1px solid
+    ${({ isInvalid, theme }) => (isInvalid ? "red" : theme.text_secondary)};
   outline: none;
   font-size: 18px;
   color: ${({ theme }) => theme.text_primary};
   border-radius: 12px;
   padding: 12px 16px;
+  transition: all 0.2s ease-in-out;
   &:focus {
     border: 1px solid ${({ theme }) => theme.primary};
   }
@@ -91,12 +92,14 @@ const ContactInput = styled.input`
 const ContactInputMessage = styled.textarea`
   flex: 1;
   background-color: transparent;
-  border: 1px solid ${({ theme }) => theme.text_secondary};
+  border: 1px solid
+    ${({ isInvalid, theme }) => (isInvalid ? "red" : theme.text_secondary)};
   outline: none;
   font-size: 18px;
   color: ${({ theme }) => theme.text_primary};
   border-radius: 12px;
   padding: 12px 16px;
+  transition: all 0.2s ease-in-out;
   &:focus {
     border: 1px solid ${({ theme }) => theme.primary};
   }
@@ -108,16 +111,6 @@ const ContactButton = styled.input`
   text-align: center;
   background: hsla(221, 100%, 50%, 1);
   background: linear-gradient(
-    225deg,
-    hsla(221, 100%, 50%, 1) 0%,
-    hsla(234, 100%, 50%, 1) 100%
-  );
-  background: -moz-linear-gradient(
-    225deg,
-    hsla(221, 100%, 50%, 1) 0%,
-    hsla(234, 100%, 50%, 1) 100%
-  );
-  background: -webkit-linear-gradient(
     225deg,
     hsla(221, 100%, 50%, 1) 0%,
     hsla(234, 100%, 50%, 1) 100%
@@ -136,15 +129,77 @@ const ContactButton = styled.input`
     filter: brightness(1.2);
     transform: scale(1.05);
   }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    filter: none;
+    background: ${({ theme }) => theme.button_disabled}
+`;
+
+const ErrorText = styled.p`
+  color: red;
+  font-size: 14px;
+  margin-top: 4px;
+  text-align: center;
 `;
 
 const Contact = () => {
-  //hooks
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState("");
+  const [touched, setTouched] = useState({});
   const form = useRef();
 
+  const [formData, setFormData] = useState({
+    from_email: "",
+    name: "",
+    subject: "",
+    message: "",
+  });
+
+  // ✅ Handle input change
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // ✅ Track if user touched a field (for red border)
+  const handleBlur = (e) => {
+    setTouched({ ...touched, [e.target.name]: true });
+  };
+
+  const isFieldInvalid = (field) => {
+    if (!touched[field]) return false;
+    if (field === "from_email") {
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return !emailPattern.test(formData.from_email);
+    }
+    return !formData[field].trim();
+  };
+
+  const isFormComplete =
+    formData.from_email &&
+    formData.name &&
+    formData.subject &&
+    formData.message;
+
+  // ✅ Handle Submit
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!isFormComplete) {
+      setError("Please fill out all fields before sending!");
+      return;
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(formData.from_email)) {
+      setError("Please enter a valid email address!");
+      return;
+    }
+
+    setError("");
+
     emailjs
       .sendForm(
         "service_xzy587d",
@@ -153,12 +208,20 @@ const Contact = () => {
         "lZKRKYu1RQxPaK7Zz"
       )
       .then(
-        (result) => {
+        () => {
           setOpen(true);
           form.current.reset();
+          setFormData({
+            from_email: "",
+            name: "",
+            subject: "",
+            message: "",
+          });
+          setTouched({});
         },
         (error) => {
           console.log(error.text);
+          setError("Something went wrong. Please try again.");
         }
       );
   };
@@ -170,20 +233,58 @@ const Contact = () => {
         <Desc>
           Feel free to reach out to me for any questions or opportunities!
         </Desc>
+
         <ContactForm ref={form} onSubmit={handleSubmit}>
           <ContactTitle>Email Me 🚀</ContactTitle>
-          <ContactInput placeholder="Your Email" name="from_email" />
-          <ContactInput placeholder="Your Name" name="name" />
-          <ContactInput placeholder="Subject" name="subject" />
-          <ContactInputMessage placeholder="Message" rows="4" name="message" />
-          <ContactButton type="submit" value="Send" />
+
+          <ContactInput
+            placeholder="Your Email"
+            name="from_email"
+            value={formData.from_email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            isInvalid={isFieldInvalid("from_email")}
+          />
+          <ContactInput
+            placeholder="Your Name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            isInvalid={isFieldInvalid("name")}
+          />
+          <ContactInput
+            placeholder="Subject"
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            isInvalid={isFieldInvalid("subject")}
+          />
+          <ContactInputMessage
+            placeholder="Message"
+            rows="4"
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            isInvalid={isFieldInvalid("message")}
+          />
+
+          {error && <ErrorText>{error}</ErrorText>}
+
+          <ContactButton
+            type="submit"
+            value="Send"
+            disabled={!isFormComplete}
+          />
         </ContactForm>
+
         <Snackbar
           open={open}
           autoHideDuration={6000}
           onClose={() => setOpen(false)}
           message="Email sent successfully!"
-          severity="success"
         />
       </Wrapper>
     </Container>
